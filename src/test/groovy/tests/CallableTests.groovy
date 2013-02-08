@@ -82,6 +82,24 @@ public class CallableTests extends Specification {
     then:
       rslt == "Power drain is currently: 5" 
   }
+
+  def 'Closure/Iterator README test'() {
+    setup:
+      // Mock readings from a volt meter
+      int voltage   = 1
+      def voltMeter = [ hasNext:{ true }, next:{ voltage++ } ] as Iterator
+      def manager = new PowerManager( currentSource:{ 10 },
+                                      voltageSource:voltMeter )
+    when:
+      def rslt = (1..5).collect { manager.update() }
+
+    then:
+      rslt == [ "Power drain is currently: 10",
+                "Power drain is currently: 20",
+                "Power drain is currently: 30",
+                "Power drain is currently: 40",
+                "Power drain is currently: 50" ]
+  }
 }
 
 class PowerManager { 
