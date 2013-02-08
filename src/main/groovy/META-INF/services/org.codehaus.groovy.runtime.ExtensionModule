@@ -1,0 +1,4 @@
+moduleName=groovy-callable
+moduleVersion=0.1
+extensionClasses=com.bloidonia.groovy.callable.CallableExtension
+staticExtensionClasses=

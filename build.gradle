@@ -1,0 +1,113 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.2'
+  }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'nexus'
+
+sourceCompatibility=1.6
+targetCompatibility=1.6
+
+version = '0.1'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile      'org.codehaus.groovy:groovy-all:2.1.0'
+  testCompile  'junit:junit:4.10'
+  testCompile( 'org.apache.ant:ant-junit:1.8.4' ) {
+      exclude(group: 'junit', module: 'junit')
+  }
+  testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+  testCompile fileTree( dir:'build/libs/', includes:[ "groovy-callable-extension-${version}.jar".toString() ] )
+}
+
+group = 'com.bloidonia'
+
+def metaServices = new File( 'src/main/groovy/META-INF/services' )
+
+task generateModule << {
+  metaServices.mkdirs()
+  new File( metaServices, 'org.codehaus.groovy.runtime.ExtensionModule' ).withWriter { w ->
+    w.writeLine 'moduleName=groovy-callable'
+    w.writeLine "moduleVersion=$version"
+    w.writeLine 'extensionClasses=com.bloidonia.groovy.callable.CallableExtension'
+    w.writeLine 'staticExtensionClasses='
+  }
+}
+
+// Hook up dependencies
+jar.dependsOn( generateModule ) 
+test.dependsOn( jar )
+uploadArchives.dependsOn( test )
+
+jar {
+  from( metaServices ) {
+    include 'org.codehaus.groovy.runtime.ExtensionModule' into( 'META-INF/services' )
+  }
+}
+
+groovydoc {
+  use             = true
+  destinationDir  = new File( "${project.buildDir.path}/groovydoc", project.version )
+  header = '<a href="https://github.com/timyates/groovy-common-extensions">groovy-common-extensions</a>'
+  footer = null
+
+  link 'http://download.oracle.com/javase/6/docs/api/',                 'java.'
+  link 'http://groovy.codehaus.org/api/',                               'groovy.', 'org.codehaus.groovy.'
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+  classifier 'javadoc'
+  from groovydoc.destinationDir
+}
+
+artifacts {
+  archives jar
+  archives sourcesJar
+  archives groovydocJar
+}
+
+modifyPom {
+  project {
+    name 'Groovy Callable Extension'
+    description 'An experimental extension making everything callable in Groovy 2+.'
+    url 'https://github.com/timyates/groovy-callable-extension'
+    inceptionYear '2013'
+
+    scm {
+      url 'https://github.com/timyates/groovy-callable-extension'
+      connection 'scm:https://github.com/timyates/groovy-callable-extension.git'
+      developerConnection 'scm:git://github.com/timyates/groovy-callable-extension.git'
+    }
+
+    licenses {
+      license {
+        name 'The Apache Software License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        distribution 'repo'
+      }
+    }
+
+    developers {
+      developer {
+        id 'tim_yates'
+        name 'Tim Yates'
+        email 'tim.yates@gmail.com'
+      }
+    }
+  }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.4'
+}
