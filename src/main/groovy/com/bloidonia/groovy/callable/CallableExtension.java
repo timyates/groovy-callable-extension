@@ -20,7 +20,7 @@ import groovy.lang.Closure ;
 import java.util.* ;
 
 public class CallableExtension {
-  public static Object call( Object delegate ) {
+  public static <T> T call( T delegate ) {
     return delegate ;
   }
 

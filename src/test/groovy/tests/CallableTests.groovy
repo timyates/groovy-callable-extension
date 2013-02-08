@@ -54,6 +54,22 @@ public class CallableTests extends Specification {
       rslt2 == 11
   }
 
+  def 'Closure test'() {
+    when:
+      def input = { 'Hello' }
+      def rslt  = input()
+    then:
+      rslt == 'Hello'
+  }
+
+  def 'Closure with param test'() {
+    when:
+      def input = { x -> "Hello $x" }
+      def rslt  = input( 2 )
+    then:
+      rslt == 'Hello 2'
+  }
+
   def 'test from the README'() {
     setup:
       // Mock readings from a volt meter
