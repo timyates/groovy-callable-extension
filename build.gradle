@@ -59,7 +59,7 @@ jar {
 groovydoc {
   use             = true
   destinationDir  = new File( "${project.buildDir.path}/groovydoc", project.version )
-  header = '<a href="https://github.com/timyates/groovy-common-extensions">groovy-common-extensions</a>'
+  header = '<a href="https://github.com/timyates/groovy-callable-extension">groovy-callable-extension</a>'
   footer = null
 
   link 'http://download.oracle.com/javase/6/docs/api/',                 'java.'
