@@ -1,4 +1,4 @@
-# groovy-callable-extensions
+# groovy-callable-extension
 
 Experimental extension which makes all objects callable.
 
